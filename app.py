@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import qrcode
+import streamlit.components.v1 as components
 import io
 import base64
 from datetime import datetime
@@ -23,8 +23,7 @@ esporte3 = st.selectbox("3º Esporte", ["", "Futebol", "Vôlei", "Natação", "T
 conhecimento_midia = st.radio("Possui conhecimento em Mídia?", ["Sim, em social media", "Sim, em gravação e edição de vídeos", "Não"])
 quiz = st.radio("Em quiz, sou melhor em:", ["Conhecimentos Gerais", "Conhecimento Bíblico", "Nenhuma das alternativas"])
 
-# --- Processamento ---
-if st.button("Enviar e Gerar Pix"):
+if st.button("Cadastrar e Pagar Inscrição"):
     # Validação simples
     if not nome or not linhagem or not tempo_convertido or not esporte1:
         st.warning("Por favor, preencha os campos obrigatórios.")
@@ -50,21 +49,12 @@ if st.button("Enviar e Gerar Pix"):
         df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
         df.to_excel("cadastros.xlsx", index=False)
 
-        st.success("Cadastro salvo com sucesso!")
+        st.success("Cadastro salvo com sucesso! Redirecionando para a página de oferta...")
 
-        # Geração do QR Pix
-        chave_pix = "sua-chave@pix.com"
-        nome_loja = "IGREJA DE DEUS PENTECOSTAL DO BRASIL"
-        cidade = "Manaus"
-        valor = 10.00  # Valor fixo para o exemplo
-
-        payload = f"00020126580014BR.GOV.BCB.PIX01{len(chave_pix):02d}{chave_pix}" \
-                  f"5204000053039865802BR5912{nome_loja[:12]}6007{cidade[:7]}62070503***6304"
-
-        qr = qrcode.make(payload)
-        buf = io.BytesIO()
-        qr.save(buf, format="PNG")
-        st.image(buf.getvalue(), caption="Escaneie o QR Pix com seu banco")
+        # Redirecionamento para Mercado Pago
+        js = "window.open('https://mpago.la/2yY4qZJ')"
+        html = f'<img src onerror="{js}">'  # trigger js via onerror
+        components.html(html, height=0)
 
         # Baixar planilha se desejar
         csv = df.to_csv(index=False)
