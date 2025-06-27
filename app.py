@@ -1,12 +1,20 @@
 import streamlit as st
-import pandas as pd
 import streamlit.components.v1 as components
-import io
-import base64
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import json
 from datetime import datetime
 
 st.set_page_config(page_title="Inscrição ACAMP 2025", layout="centered")
 st.title("Inscrição ACAMP 2025")
+
+# Autenticação com Google Sheets
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+google_json = json.loads(st.secrets["google"].to_json())
+creds = ServiceAccountCredentials.from_json_keyfile_dict(google_json, scope)
+client = gspread.authorize(creds)
+sheet = client.open("ACAMP 2025").sheet1  # Nome da planilha e aba
+
 
 # --- Formulário ---
 nome = st.text_input("Nome completo")
@@ -28,40 +36,36 @@ if st.button("Cadastrar e Pagar Inscrição"):
     if not nome or not linhagem or not tempo_convertido or not esporte1:
         st.warning("Por favor, preencha os campos obrigatórios.")
     else:
-        data = {
-            "Nome": nome,
-            "Idade": idade,
-            "Igreja": igreja,
-            "Linhagem": linhagem,
-            "Tempo de convertido": tempo_convertido,
-            "Esportes": f"{esporte1}, {esporte2}, {esporte3}",
-            "Conhecimento em Mídia": conhecimento_midia,
-            "Quiz": quiz,
-            "DataHora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "Pagamento": "Pendente"
-        }
+        dados = [
+            nome,
+            idade,
+            igreja,
+            linhagem,
+            tempo_convertido,
+            f"{esporte1}, {esporte2}, {esporte3}",
+            conhecimento_midia,
+            quiz,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "Pendente"
+        ]
 
-        # Salvar no Excel
-        try:
-            df = pd.read_excel("cadastros.xlsx")
-        except FileNotFoundError:
-            df = pd.DataFrame()
+        # Verifica se a planilha está vazia e adiciona cabeçalho
+        if len(sheet.get_all_values()) == 0:
+            cabecalho = [
+                "Nome", "Idade", "Igreja", "Linhagem", "Tempo de convertido",
+                "Esportes", "Conhecimento em Mídia", "Quiz",
+                "Data e Hora", "Pagamento"
+            ]
+            sheet.append_row(cabecalho)
 
-        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
-        df.to_excel("cadastros.xlsx", index=False)
+        sheet.append_row(dados)
 
-        st.success("Cadastro salvo com sucesso! Redirecionando para a página de oferta...")
+        st.success("Cadastro salvo com sucesso! Você será redirecionado para a página de oferta.")
 
-        # Redirecionamento para Mercado Pago
-        js = "window.open('https://mpago.la/2yY4qZJ')"
-        html = f'<img src onerror="{js}">'  # trigger js via onerror
+        # Redirecionamento automático
+        js = "window.location.href = 'https://mpago.la/2yY4qZJ'"
+        html = f'<script>{js}</script>'
         components.html(html, height=0)
 
         # Fallback link visível
         st.markdown("[🔗 Clique aqui se não for redirecionado automaticamente](https://mpago.la/2yY4qZJ)")
-
-        # Baixar planilha se desejar
-        csv = df.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()
-        href = f'<a href="data:file/csv;base64,{b64}" download="cadastros.csv">📥 Baixar lista de cadastros</a>'
-        st.markdown(href, unsafe_allow_html=True)
