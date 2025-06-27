@@ -37,7 +37,8 @@ if st.button("Cadastrar e Pagar Inscrição"):
             "Esportes": f"{esporte1}, {esporte2}, {esporte3}",
             "Conhecimento em Mídia": conhecimento_midia,
             "Quiz": quiz,
-            "DataHora": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "DataHora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "Pagamento": "Pendente"
         }
 
         # Salvar no Excel
@@ -55,6 +56,9 @@ if st.button("Cadastrar e Pagar Inscrição"):
         js = "window.open('https://mpago.la/2yY4qZJ')"
         html = f'<img src onerror="{js}">'  # trigger js via onerror
         components.html(html, height=0)
+
+        # Fallback link visível
+        st.markdown("[🔗 Clique aqui se não for redirecionado automaticamente](https://mpago.la/2yY4qZJ)")
 
         # Baixar planilha se desejar
         csv = df.to_csv(index=False)
