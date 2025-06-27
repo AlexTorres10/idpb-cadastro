@@ -10,8 +10,7 @@ st.title("Inscrição ACAMP 2025")
 
 # Autenticação com Google Sheets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-google_json = json.loads(st.secrets["google"].to_json())
-creds = ServiceAccountCredentials.from_json_keyfile_dict(google_json, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["google"], scope)
 client = gspread.authorize(creds)
 sheet = client.open("ACAMP 2025").sheet1  # Nome da planilha e aba
 
@@ -31,10 +30,14 @@ esporte3 = st.selectbox("3º Esporte", ["", "Futebol", "Vôlei", "Natação", "T
 conhecimento_midia = st.radio("Possui conhecimento em Mídia?", ["Sim, em social media", "Sim, em gravação e edição de vídeos", "Não"])
 quiz = st.radio("Em quiz, sou melhor em:", ["Conhecimentos Gerais", "Conhecimento Bíblico", "Nenhuma das alternativas"])
 
-if st.button("Cadastrar e Pagar Inscrição"):
-    # Validação simples
+if st.button("Enviar e Ir para Oferta"):
+    esportes = [esporte1, esporte2, esporte3]
+    esportes_unicos = set([e for e in esportes if e])
+
     if not nome or not linhagem or not tempo_convertido or not esporte1:
         st.warning("Por favor, preencha os campos obrigatórios.")
+    elif len(esportes_unicos) < 3:
+        st.warning("Por favor, escolha 3 esportes diferentes.")
     else:
         dados = [
             nome,
