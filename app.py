@@ -4,32 +4,25 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
 from datetime import datetime
+import base64
+
+def get_base64_of_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
 
 st.set_page_config(page_title="Inscrição ACAMP 2025", layout="centered")
 st.title("Inscrição ACAMP 2025")
+img_base64 = get_base64_of_image("IDPB.png")
 
 # CSS para fundo com imagem e sobreposição preta
 st.markdown(
     f"""
     <style>
     .stApp {{
-        background-image: url("/app/static/IDPB.png");
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("data:image/png;base64,{img_base64}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        position: relative;
-    }}
-    .stApp::before {{
-        content: "";
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 0;
-    }}
-    .stApp > * {{
-        position: relative;
-        z-index: 1;
     }}
     </style>
     """,
