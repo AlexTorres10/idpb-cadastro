@@ -2,9 +2,9 @@ import streamlit as st
 import streamlit.components.v1 as components
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import base64
+from zoneinfo import ZoneInfo
 
 def get_base64_of_image(image_path):
     with open(image_path, "rb") as img_file:
@@ -60,6 +60,7 @@ if st.button("Enviar e Ir para Oferta"):
     elif len(esportes_unicos) < 3:
         st.warning("Por favor, escolha 3 esportes diferentes.")
     else:
+        hora_manaus = datetime.now(ZoneInfo("America/Manaus"))
         dados = [
             nome,
             idade,
@@ -69,7 +70,7 @@ if st.button("Enviar e Ir para Oferta"):
             f"{esporte1}, {esporte2}, {esporte3}",
             conhecimento_midia,
             quiz,
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            hora_manaus.strftime("%Y-%m-%d %H:%M:%S"),
             "Pendente"
         ]
 
