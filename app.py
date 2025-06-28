@@ -13,7 +13,7 @@ st.markdown(
     f"""
     <style>
     .stApp {{
-        background-image: url("IDPB.png");
+        background-image: url("/app/static/IDPB.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
