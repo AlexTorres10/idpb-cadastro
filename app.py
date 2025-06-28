@@ -78,8 +78,8 @@ if st.button("Enviar e Ir para Oferta"):
         primeira_linha = sheet.row_values(1)
         cabecalho = [
             "Nome", "Idade", "Igreja", "Linhagem", "Tempo de convertido",
-            "Esportes", "Conhecimento em Mídia", "Quiz",
-            "DataHora", "Pagamento"
+            "Esportes", "Mídia", "Quiz",
+            "Data e Hora", "Pagamento"
         ]
 
         if primeira_linha != cabecalho:
@@ -88,12 +88,19 @@ if st.button("Enviar e Ir para Oferta"):
         # Sempre adiciona os dados após o cabeçalho
         sheet.append_row(dados)
 
-        st.success("Cadastro salvo com sucesso! Você será redirecionado para o link de pagamento de inscrição.")
+        st.success("Cadastro salvo com sucesso! Você será redirecionado para a página de oferta.")
 
-        # Redirecionamento automático
-        js = "window.location.href = 'https://mpago.la/2yY4qZJ'"
-        html = f'<script>{js}</script>'
-        components.html(html, height=0)
-
-        # Fallback link visível
-        st.markdown("[🔗 Clique aqui se não for redirecionado automaticamente](https://mpago.la/2yY4qZJ)")
+        # Redirecionamento automático + fallback visível
+        components.html(
+            """
+            <script>
+                setTimeout(function() {
+                    window.location.href = "https://mpago.la/2yY4qZJ";
+                }, 1000);
+            </script>
+            <p style='margin-top:10px;'>
+                Se não for redirecionado automaticamente, <a href="https://mpago.la/2yY4qZJ" target="_blank">clique aqui</a>.
+            </p>
+            """,
+            height=80
+        )
