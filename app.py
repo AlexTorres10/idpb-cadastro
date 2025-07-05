@@ -12,14 +12,14 @@ def get_base64_of_image(image_path):
 
 st.set_page_config(page_title="Inscrição ACAMP 2025", layout="centered")
 st.title("Inscrição ACAMP 2025")
-img_base64 = get_base64_of_image("IDPB.png")
+img_base64 = get_base64_of_image("MRJ.png")
 
 # CSS para fundo com imagem e sobreposição preta
 st.markdown(
     f"""
     <style>
     .stApp {{
-        background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url("data:image/png;base64,{img_base64}");
+        background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url("data:image/png;base64,{img_base64}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
