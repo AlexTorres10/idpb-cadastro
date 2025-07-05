@@ -19,7 +19,7 @@ st.markdown(
     f"""
     <style>
     .stApp {{
-        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("data:image/png;base64,{img_base64}");
+        background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url("data:image/png;base64,{img_base64}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -51,7 +51,11 @@ esporte3 = st.selectbox("3º Esporte", ["", "Futebol", "Vôlei", "Natação", "T
 conhecimento_midia = st.radio("Possui conhecimento em Mídia?", ["Sim, em social media", "Sim, em gravação e edição de vídeos", "Não"])
 quiz = st.radio("Em quiz, sou melhor em:", ["Conhecimentos Gerais", "Conhecimento Bíblico", "Nenhuma das alternativas"])
 
-if st.button("Enviar e Ir para Oferta"):
+st.warning("""
+> 🔔 **Atenção:** Ao clicar no botão de cadastro, você será automaticamente redirecionado a um link do Mercado Pago para pagar sua inscrição.
+""")
+
+if st.button("Cadastrar-se e Pagar a Inscrição"):
     esportes = [esporte1, esporte2, esporte3]
     esportes_unicos = set([e for e in esportes if e])
 
