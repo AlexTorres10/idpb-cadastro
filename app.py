@@ -45,12 +45,14 @@ st.markdown(
         background-repeat: no-repeat;
         color: white;
     }}
-    .stTextInput > div > div > input,
-    .stNumberInput > div > div > input,
-    .stSelectbox > div > div > div > div,
-    .stRadio > div > label,
-    .stMarkdown p,
-    .stButton > button {{
+    html, body, [class*="css"]  {{
+        color: white !important;
+        background-color: transparent;
+    }}
+    input, textarea, select, .stButton > button, .stRadio label, .stSelectbox div, .stNumberInput input, .stTextInput input {{
+        color: white !important;
+    }}
+    label, .stMarkdown, .stRadio, .stSelectbox div, .stTextInput, .stNumberInput {{
         color: white !important;
     }}
     </style>
