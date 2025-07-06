@@ -5,16 +5,36 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime, timedelta
 import base64
 from zoneinfo import ZoneInfo
+import time
+import random
+import csv
+import os
 
+# --- Função de background ---
 def get_base64_of_image(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
 
+# --- Função para append com resiliência ---
+def append_com_resiliencia(sheet, dados, tentativas=5):
+    for i in range(tentativas):
+        try:
+            sheet.append_row(dados)
+            return True
+        except Exception as e:
+            espera = (2 ** i) + random.random()
+            st.warning(f"Tentando novamente em {espera:.1f} segundos...")
+            time.sleep(espera)
+    st.error("Tente novamente. O servidor está recebendo muitas inscrições no momento.")
+    return False
+
+
+# --- Configurações iniciais ---
 st.set_page_config(page_title="Inscrição ACAMP 2025", layout="centered")
-st.title("Inscrição ACAMP 2025")
+
 img_base64 = get_base64_of_image("MRJ.png")
 
-# CSS para fundo com imagem e sobreposição preta
+# --- Estilo CSS ---
 st.markdown(
     f"""
     <style>
@@ -23,18 +43,22 @@ st.markdown(
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        color: white;
+    }}
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div > div > div,
+    .stRadio > div > label,
+    .stMarkdown p,
+    .stButton > button {{
+        color: white !important;
     }}
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Autenticação com Google Sheets
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["google"], scope)
-client = gspread.authorize(creds)
-sheet = client.open("ACAMP 2025").sheet1  # Nome da planilha e aba
-
+st.title("Inscrição ACAMP 2025")
 
 # --- Formulário ---
 nome = st.text_input("Nome completo")
@@ -54,6 +78,12 @@ quiz = st.radio("Em quiz, sou melhor em:", ["Conhecimentos Gerais", "Conheciment
 st.warning("""
 > 🔔 **Atenção:** Ao clicar no botão de cadastro, você será automaticamente redirecionado a um link do Mercado Pago para pagar sua inscrição.
 """)
+
+# --- Autenticação Google Sheets ---
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["google"], scope)
+client = gspread.authorize(creds)
+sheet = client.open("ACAMP 2025").sheet1
 
 if st.button("Cadastrar-se e Pagar a Inscrição"):
     esportes = [esporte1, esporte2, esporte3]
@@ -89,12 +119,13 @@ if st.button("Cadastrar-se e Pagar a Inscrição"):
         if primeira_linha != cabecalho:
             sheet.insert_row(cabecalho, index=1)
 
-        # Sempre adiciona os dados após o cabeçalho
-        sheet.append_row(dados)
+        if append_com_resiliencia(sheet, dados):
 
-        st.success("Cadastro salvo com sucesso! Você será redirecionado para o link de pagamento de inscrição.")
+            st.success("Cadastro salvo com sucesso! Você será redirecionado para o link de pagamento de inscrição.")
 
-        st.markdown("""
-        <meta http-equiv="refresh" content="0; url=https://mpago.la/2yY4qZJ" />
-        <p style='margin-top:10px;'>Se não for redirecionado, <a href="https://mpago.la/2yY4qZJ" target="_blank">clique aqui</a>.</p>
-        """, unsafe_allow_html=True)
+            st.markdown("""
+            <meta http-equiv="refresh" content="0; url=https://mpago.la/2yY4qZJ" />
+            <p style='margin-top:10px;'>Se não for redirecionado, <a href="https://mpago.la/2yY4qZJ" target="_blank">clique aqui</a>.</p>
+            """, unsafe_allow_html=True)
+        else:
+            st.warning("Você pode tentar novamente clicando no botão de cadastro.")
