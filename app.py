@@ -70,9 +70,9 @@ linhagem = st.text_input("Linhagem")
 tempo_convertido = st.text_input("Tempo de convertido")
 
 st.markdown("**Esportes (ordem de habilidade)**")
-esporte1 = st.selectbox("1º Esporte", ["", "Futebol", "Vôlei", "Natação", "Tênis de mesa", "Corrida"])
-esporte2 = st.selectbox("2º Esporte", ["", "Futebol", "Vôlei", "Natação", "Tênis de mesa", "Corrida"])
-esporte3 = st.selectbox("3º Esporte", ["", "Futebol", "Vôlei", "Natação", "Tênis de mesa", "Corrida"])
+esporte1 = st.selectbox("1º Esporte", ["", "Futebol", "Vôlei", "Natação", "Tênis de mesa", "Corrida", "Não tenho habilidade em esportes"])
+esporte2 = st.selectbox("2º Esporte", ["", "Futebol", "Vôlei", "Natação", "Tênis de mesa", "Corrida", "Não tenho habilidade em esportes"])
+esporte3 = st.selectbox("3º Esporte", ["", "Futebol", "Vôlei", "Natação", "Tênis de mesa", "Corrida", "Não tenho habilidade em esportes"])
 
 conhecimento_midia = st.radio("Possui conhecimento em Mídia?", ["Sim, em social media", "Sim, em gravação e edição de vídeos", "Não"])
 quiz = st.radio("Em quiz, sou melhor em:", ["Conhecimentos Gerais", "Conhecimento Bíblico", "Nenhuma das alternativas"])
@@ -93,8 +93,11 @@ if st.button("Cadastrar-se e Pagar a Inscrição"):
 
     if not nome or not linhagem or not tempo_convertido or not esporte1:
         st.warning("Por favor, preencha os campos obrigatórios.")
-    elif len(esportes_unicos) < 3:
-        st.warning("Por favor, escolha 3 esportes diferentes.")
+    elif ("Não tenho habilidade em esportes" not in esportes and len(esportes_unicos) < 3) or (
+        "Não tenho habilidade em esportes" in esportes
+        and len([e for e in esportes if e != "Não tenho habilidade em esportes"]) != len(set([e for e in esportes if e != "Não tenho habilidade em esportes"]))
+    ):
+        st.warning("Escolha 3 esportes diferentes, a menos que repita apenas 'Não tenho habilidade em esportes'.")
     else:
         hora_manaus = datetime.now(ZoneInfo("America/Manaus"))
         dados = [
